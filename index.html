@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+
+  <body>
+    <h1>Server-Sent Events</h1>
+    <ul id="list"></ul>
+
+    <script>
+      // Create a new EventSource to listen for events from the server
+      const evtSource = new EventSource("http://localhost:3000/sse");
+
+      /* If the event generator script is hosted on a different origin (cross-origin request):
+const evtSource = new EventSource("//api.example.com/sse-demo.js", {
+  withCredentials: true,  // Sends cookies, authorization headers with the request to the server
+});
+*/
+      // When a message event is received
+      evtSource.onmessage = (event) => {
+        // Create a new list item element to display the message
+        const newElement = document.createElement("li");
+
+        // Get the reference to the unordered list element where messages will be displayed
+        const eventList = document.getElementById("list");
+
+        // Set the text content of the new list item to the message received
+        newElement.textContent = `message: ${event.data}`;
+
+        // Append the new list item to the event list (ul) in the HTML
+        eventList.appendChild(newElement);
+      };
+
+      // Add an event listener for a custom event type, "ping"
+      evtSource.addEventListener("ping", (event) => {
+        // Create a new list item element to display the ping event
+        const newElement = document.createElement("li");
+
+        // Get the reference to the unordered list element where ping events will be displayed
+        const eventList = document.getElementById("list");
+
+        // Parse the event data as JSON (assuming it contains a time property)
+        const time = JSON.parse(event.data).time;
+
+        // Set the text content of the new list item to display the ping time
+        newElement.textContent = `ping at ${time}`;
+
+        // Append the new list item to the event list (ul) in the HTML
+        eventList.appendChild(newElement);
+      });
+    </script>
+  </body>
+</html>
